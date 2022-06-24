@@ -7,3 +7,9 @@ services:
     ports:
     - '8080:8080'
     command: /bin/sh -c "yarn serve"
+  backend:
+    build:
+      context: ./backend
+      target: 'develop-stage-backend'
+    ports:
+    - '3005:3005'
