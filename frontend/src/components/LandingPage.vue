@@ -38,4 +38,15 @@ li {
 a {
   color: #42b983;
 }
+
+button.p-button.p-component {
+ align-items: center; 
+ background-color: #2196f3; 
+ color: #ffffff; 
+ display: inline-flex; 
+ font-family: -apple-system; 
+ text-align: left; 
+ margin-left: 10px;
+}
+
 </style>

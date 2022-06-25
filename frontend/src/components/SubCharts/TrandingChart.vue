@@ -27,7 +27,7 @@ import {
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
 export default {
-  name: 'RandomChart',
+  name: 'TrendingChart',
   components: {
     Doughnut
   },
@@ -61,9 +61,8 @@ export default {
       default: () => []
     }
   },
-  data() {
-    return {
-      chartData: {
+  setup(){
+    const chartData = {
         labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
         datasets: [
           {
@@ -71,12 +70,13 @@ export default {
             data: [40, 20, 80, 10]
           }
         ]
-      },
-      chartOptions: {
+      };
+    const chartOptions = {
         responsive: true,
         maintainAspectRatio: false
-      }
-    }
+      };
+
+    return { chartData, chartOptions }
   }
 }
 </script>

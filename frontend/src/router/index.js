@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import RandomChart from '@/components/RandomChart.vue'
+import Chart from '@/components/Chart.vue'
 
 const routes = [
   {
@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/historic-chart',
     name: 'historic-chart',
-    component: RandomChart
+    component: Chart
   },
   {
     path: '/price-prediction',
