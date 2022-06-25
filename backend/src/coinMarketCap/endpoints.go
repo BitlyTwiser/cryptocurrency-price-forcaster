@@ -1,6 +1,7 @@
 package coinMarketCap
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -14,6 +15,13 @@ type Endpoints struct {
 	mapEndpoint string
 	apiVersion  string
 	baseUrl     string
+}
+type DataStruct struct {
+	Data []struct {
+		Name   string `json:"name"`
+		Symbol string `json:"symbol"`
+		Rank   int    `json:"rank"`
+	} `json:"data"`
 }
 
 func (e *Endpoints) EndpointsConstructor() {
@@ -43,7 +51,14 @@ func (e *Endpoints) GetCryptoSymbols(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error sending request to server")
 	}
 	fmt.Println(resp.Status)
+
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
-	w.Write([]byte(respBody))
+	var data DataStruct
+	err = json.Unmarshal(respBody, &data)
+	if err != nil {
+		log.Println("Error unmarshalling data. Error: ", err)
+	}
+
+	json.NewEncoder(w).Encode(data)
 }
