@@ -6,12 +6,23 @@
     </div>
     <div v-else>
         <div v-if="cryptoSymbols.length > 0">
-            <Dropdown v-model="selectedCryptoSymbol" :options="cryptoSymbols" optionLabel="name" placeholder="Selected your crypto" class="dropdown"/>
+            <Dropdown 
+                v-model="selectedCryptoSymbol" 
+                :options="cryptoSymbols" 
+                optionLabel="name" 
+                placeholder="Selected your crypto" 
+                class="dropdown"
+                :filter="true"
+                @change="showCurrentDataForSelectedSymbol"
+            />
         </div>
         <div v-else>
             No Data Loaded            
         </div>
-        <Button @click="obtainFuturePricingEstimate" class="prediction-data" :disabled="buttonDisabled">Request Price Prediction</Button>
+        <Button 
+            @click="obtainFuturePricingEstimate" 
+            class="prediction-data" 
+            :disabled="buttonDisabled">Request Price Prediction</Button>
     </div>
     <Toast />
   </div>
@@ -51,7 +62,6 @@ export default {
       this.loading = true
       await axios.get('http://127.0.0.1:3005/get-crypto-symbols')
       .then(resp => {
-        debugger
         this.normalizeData(resp.data)
         this.createToast('success', 'Success', 'Successfully obtained records')
         this.loading = false
@@ -69,10 +79,19 @@ export default {
     },
     obtainFuturePricingEstimate(){
         if(this.selectedCryptoSymbol){
+            console.log(this.selectedCryptoSymbol)
         } else {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
         }
-        console.log(this.selectedCryptoSymbol)
+    },
+    async showCurrentDataForSelectedSymbol(){
+        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/market_chart/range?vs_currency=usd&from=1392577232&to=1422577232`)
+                .then((resp)=>{
+                    debugger
+                    console.table(resp.data.prices)
+                }).catch((error) => {
+                    console.debug(error)
+                })
     }
   }
 }

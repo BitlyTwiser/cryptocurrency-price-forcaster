@@ -3,6 +3,7 @@
     <h1>Welcome to the Capstone Cryptocurrency project</h1>
     <p>You can use this app to visualize current/previous cryprocurrency data for trending currencies in the market.</p>
     <p>You can also utlize the machine learning elements of this project to attempt to ascertain what the price of selected coins might be in the future!</p>
+    <p>The prediction mechanism utilizes an adaptation of Guassian Naive Bayes algorithm.</p>
     <p>Use the navBar above to visit a selected page</p>
   </div>
 </template>
