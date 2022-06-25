@@ -1,7 +1,7 @@
 package main
 
 import (
-	"capstone/src/coinMarketCap"
+	"capstone/src/coinGecko"
 	"fmt"
 	"log"
 	"net/http"
@@ -48,12 +48,12 @@ func run() {
 func (a App) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
 
 func newRouter() App {
-	cmc := coinMarketCap.Endpoints{}
-	cmc.EndpointsConstructor()
+	cg := coinGecko.CoinGecko{}
+	cg.CoinGeckoConstructor()
 
 	a := App{router: mux.NewRouter()}
 	a.router.Use(mux.CORSMethodMiddleware(a.router))
 	a.router.Handle("/favicon.ico", http.NotFoundHandler())
-	a.router.HandleFunc("/get-crypto-symbols", cmc.GetCryptoSymbols).Methods(http.MethodGet)
+	a.router.HandleFunc("/get-crypto-symbols", cg.ListCryptoCurrencies).Methods(http.MethodGet)
 	return a
 }

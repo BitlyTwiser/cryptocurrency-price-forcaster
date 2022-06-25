@@ -1,21 +1,16 @@
 <template>
   <div class="hello">
     <h1>Welcome to the Capstone Cryptocurrency project</h1>
-    <p>You can use this app to visualize current/previous cryprocurrency data for selected assets</p>
-    <p>You can also utlize the machine learning elements of this project to attempt to ascertain what the price of selected coins might be in the future.</p>
-    <p>Use the navBar above to visit a selecte page or click any of the buttons below to get started</p>
-    <Button>button1</Button>
-    <Button>button2</Button>
-    <Button>button3</Button>
+    <p>You can use this app to visualize current/previous cryprocurrency data for trending currencies in the market.</p>
+    <p>You can also utlize the machine learning elements of this project to attempt to ascertain what the price of selected coins might be in the future!</p>
+    <p>Use the navBar above to visit a selected page</p>
   </div>
 </template>
 
 <script>
-import Button from 'primevue/button'
 
 export default {
   name: 'LandingPage',
-  components: { Button },
   props: {
     msg: String
   }
