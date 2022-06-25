@@ -52,7 +52,7 @@ export default {
       await axios.get('http://127.0.0.1:3005/get-crypto-symbols')
       .then(resp => {
         debugger
-        this.normalizeData(resp.data.data)
+        this.normalizeData(resp.data)
         this.createToast('success', 'Success', 'Successfully obtained records')
         this.loading = false
       })
