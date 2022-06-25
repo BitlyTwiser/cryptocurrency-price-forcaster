@@ -5,25 +5,27 @@
     <div v-if="cryptoSymbols.length > 0">
       {{cryptoSymbols}}
     </div>
-    
+    <Toast />
   </div>
 </template>
 
 <script>
 import axios from "axios"
 import Button from 'primevue/button'
+import Toast from 'primevue/toast'
 
 export default {
   name: 'CalculateFuturePrice',
   components: {
-    Button
+    Button,
+    Toast
   },
   data() {
     return {
       cryptoSymbols: []
     }
   },
-  compouted: {
+  computed: {
 
   },
   methods: {
@@ -31,9 +33,10 @@ export default {
       await axios.get('http://127.0.0.1:3005/get-crypto-symbols')
       .then(resp => {
         this.normalizeData(resp.data.data)
+        this.$toast.add({severity:'success', summary: 'Success', detail:'Successfully obtained records', life: 3000})
       })
       .catch(error => 
-        console.log(error)
+        this.$toast.add({severity:'error', summary: 'Failed', detail:'Failed to Obtain Cryptocurrency records', life: 3000})
       )
     },
     normalizeData(cryptoData){

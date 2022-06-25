@@ -7,8 +7,14 @@ import PrimeVue from 'primevue/config'
 import "primevue/resources/themes/saga-blue/theme.css"
 import "primevue/resources/primevue.min.css"
 import "primeicons/primeicons.css"
+import Dialog from 'primevue/dialog'
+import ToastService from 'primevue/toastservice'
 const app = createApp(App)
 
+app.use(router)
 app.use(VueAxios, axios)
-app.use(PrimeVue)
-createApp(App).use(router).mount('#app')
+app.use(PrimeVue, {})
+app.use(ToastService)
+// eslint-disable-next-line
+app.component('Dialog', Dialog)
+app.mount('#app')
