@@ -1,7 +1,7 @@
 <template>
-  <div class="content-section implementation">
-      <div class="card flex justify-content-center">
-          <Chart type="pie" :data="chartData" style="width: 40%" />
+  <div>
+      <div>
+          <Chart type="pie" :data="chartData" class="chart-size" />
       </div>
   </div>
 </template>
@@ -30,3 +30,10 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* .chart-size{
+    width: 20%; 
+    height: 20%
+  } */
+</style>
