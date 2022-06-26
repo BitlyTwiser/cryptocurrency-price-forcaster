@@ -1,9 +1,12 @@
 <template>
   <section>
     <div class="trending-chart">
+      <h3>Trending Cryto Currencies</h3>
+      <p><small>Top 7 trending coins</small></p>
       <trending-chart />
     </div>
     <div class="trending-gainers-losts-chart">
+      <h3>Trending Gainers and Losers</h3>
       <trending-gainers-and-losers />
     </div>
   </section>
@@ -25,14 +28,14 @@ export default {
 <style>
   .trending-chart {
     display: inline-block;
-    min-width: 40%;
-    max-width: 40%;
+    min-width: 30%;
+    max-width: 30%;
   }
 
   .trending-gainers-losts-chart {
     display: inline-block;
-    min-width: 40%;
-    max-width: 40%;
+    min-width: 35%;
+    max-width: 35%;
   }
 </style>
 

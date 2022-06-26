@@ -85,7 +85,9 @@ export default {
         }
     },
     async showCurrentDataForSelectedSymbol(){
-        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/market_chart/range?vs_currency=usd&from=1392577232&to=1422577232`)
+        const date = new Date()
+        
+        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/market_chart/range?vs_currency=usd&from=${date.getTime()}&to=${date.setFullYear(date.getFullYear() + 1)}`)
                 .then((resp)=>{
                     debugger
                     console.table(resp.data.prices)

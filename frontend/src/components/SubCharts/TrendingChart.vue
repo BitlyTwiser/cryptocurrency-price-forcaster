@@ -15,19 +15,54 @@ export default {
   components: {
     Chart
   },
+  mounted(){
+    this.setChartDataLabels()
+    this.setChartData()
+  },
   setup(){
     const chartData = ref({
-        labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-        datasets: [
-          {
-            backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-            data: [40, 20, 80, 10]
-          }
-        ]
+        labels: [],
+        datasets: []
       });
 
     return { chartData }
-  }
+  },
+  methods: {
+    randomInt(limit){
+      return Math.floor(Math.random() * limit)
+    },
+    randomColorGenerator(){
+      let colorCode = '#'
+      const ints = [...Array(10).keys()]
+      const alpha = Array.from(Array(26)).map((e, i) => i + 65)
+      const alphanumeric = alpha.map(x => String.fromCharCode(x))
+      const allValues = [ ...ints, ...alphanumeric ]
+      
+      while(colorCode.length < 7){
+        colorCode = colorCode + allValues[this.randomInt(allValues.length)]
+      }
+      console.log(colorCode)
+      return colorCode
+    },
+    setChartDataLabels(){
+      this.chartData.labels = ['VueJs', 'EmberJs', 'ReactJs', 'Poop']
+    },
+    chartDataGenerator(){
+      // Iterate through all of the trending values, for each, push the random colors and price onto the stack.
+    },
+    setChartData(){
+      this.chartData.datasets = [
+        {
+          backgroundColor: [`rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`,`rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`],
+          data: [40, 20, 80, 10]
+        },
+        {
+          backgroundColor: [`rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`,`rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`],
+          data: [100, 90, 2, 124, 5]
+        }
+      ]
+    }
+  },
 }
 </script>
 
