@@ -12,16 +12,15 @@ import (
 func (cg *CoinGecko) CoinGeckoConstructor() {
 	cg.apiVersion = "v3"
 	cg.baseUrl = "https://api.coingecko.com/api"
-	cg.coinsEndpoint = "coins"
+	cg.coinsListEndpoint = "coins/list"
+	cg.coinsTrendingEndpoint = "search/trending"
 }
 
-func (cg *CoinGecko) ListCryptoCurrencies(w http.ResponseWriter, req *http.Request) {
-	td := TrendingData{}
-	fmt.Println(td.Coins)
+func (cg *CoinGecko) requestMaker(structToMarshall interface{}, endpoint string) interface{} {
 	log.Println("Getting the crypto data")
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s/list", cg.baseUrl, cg.apiVersion, cg.coinsEndpoint), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", cg.baseUrl, cg.apiVersion, endpoint), nil)
 	if err != nil {
 		log.Print(err)
 	}
@@ -39,16 +38,28 @@ func (cg *CoinGecko) ListCryptoCurrencies(w http.ResponseWriter, req *http.Reque
 
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
-	var data ListCoinData
-	err = json.Unmarshal(respBody, &data)
+	err = json.Unmarshal(respBody, &structToMarshall)
 	if err != nil {
 		log.Println("Error unmarshalling data. Error: ", err)
 	}
 
-	json.NewEncoder(w).Encode(data)
+	return structToMarshall
 }
 
-func ListTrendinCurrencies() {
-	td := TrendingData{}
-	fmt.Println(td.Coins)
+func (cg *CoinGecko) ListCryptoCurrencies(w http.ResponseWriter, req *http.Request) {
+	log.Println("Getting the crypto data")
+
+	var data ListCoinData
+	filledData := cg.requestMaker(data, cg.coinsListEndpoint)
+
+	json.NewEncoder(w).Encode(filledData)
+}
+
+func (cg *CoinGecko) ListTrendinCurrencies(w http.ResponseWriter, req *http.Request) {
+	log.Println("Getting trending data")
+
+	var data TrendingData
+	filledData := cg.requestMaker(data, cg.coinsTrendingEndpoint)
+
+	json.NewEncoder(w).Encode(filledData)
 }

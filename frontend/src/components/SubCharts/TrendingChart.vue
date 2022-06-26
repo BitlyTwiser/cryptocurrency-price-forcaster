@@ -3,19 +3,24 @@
       <div>
           <Chart type="pie" :data="chartData" class="chart-size" />
       </div>
+      <Toast />
   </div>
 </template>
 
 <script>
 import Chart from 'primevue/chart'
 import { ref } from "vue"
+import axios from "axios"
+import Toast from 'primevue/toast'
 
 export default {
   name: 'TrendingChart',
   components: {
-    Chart
+    Chart,
+    Toast
   },
-  mounted(){
+  async mounted(){
+    await this.getTrendingData()
     this.setChartDataLabels()
     this.setChartData()
   },
@@ -30,6 +35,19 @@ export default {
   methods: {
     randomInt(limit){
       return Math.floor(Math.random() * limit)
+    },
+    async getTrendingData(){
+      await axios.get('http://127.0.0.1:3005/get-trending-data')
+              .then((resp) => {
+                debugger
+                console.log('Trendong')
+              })
+              .catch((error) => {
+                this.createToast('error', 'Failed', 'Failed to obtain trending data')
+              })
+    },
+    createToast(severity, summary, message){
+        this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
     },
     randomColorGenerator(){
       let colorCode = '#'
