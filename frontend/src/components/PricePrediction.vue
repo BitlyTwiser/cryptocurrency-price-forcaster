@@ -13,20 +13,20 @@
                 placeholder="Selected your crypto" 
                 class="dropdown"
                 :filter="true"
-                @change="showCurrentDataForSelectedSymbol"
+                @change="crypoSelected"
             />
         </div>
         <div v-else>
             No Data Loaded            
         </div>
-        <div v-if="selectedCryptoSymbol">
-            <p><small>OLH</small></p>
-            <DataTable :value="returnDatatableValue">
-                <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
-            </DataTable>
-
+        <div v-if="selectedCryptoSymbol && series[0].data.length > 0">
+            <p><small>OLHC data for {{selectedCryptoSymbol.name}}</small></p>
+            <div class="chart">
+                <apexchart type="candlestick" height="350" :options="chartOptions" :series="seriesData"></apexchart>
+            </div>
+        
             <Button 
-                @click="crypoSelected" 
+                @click="obtainFuturePricingEstimate" 
                 class="prediction-data" 
                 :disabled="buttonDisabled">Request Price Prediction</Button>
         </div>
@@ -41,8 +41,6 @@ import axios from "axios"
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
-import Column from 'primevue/column'
-import DataTable from 'primevue/datatable'
 import { ref } from "vue"
 
 export default {
@@ -51,16 +49,32 @@ export default {
     Button,
     Toast,
     Dropdown,
-    DataTable,
-    Column
   },
   setup(){
     const selectedCryptoSymbol = ref(null);
     const cryptoSymbols = ref([]);
     const loading = ref(false);
-    const columns = ref([]);
+    const chartOptions = ref({
+            chart: {
+              type: 'candlestick',
+              height: 350
+            },
+            title: {
+              text: 'CandleStick Chart',
+              align: 'left'
+            },
+            xaxis: {
+              type: 'datetime'
+            },
+            yaxis: {
+              tooltip: {
+                enabled: true
+              }
+            }
+          });
+    const series =  ref([{data: []}]);
 
-    return { selectedCryptoSymbol, cryptoSymbols, loading }
+    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series }
   },
   mounted(){
     this.getCrytoSymbols()
@@ -68,6 +82,10 @@ export default {
   computed: {
     buttonDisabled(){
         return this.selectedCryptoSymbol.length < 1
+    },
+    seriesData(){
+        debugger
+        return this.series
     }
   },
   methods: {
@@ -99,25 +117,35 @@ export default {
     },
     async crypoSelected(){
         await this.showCurrentDataForSelectedSymbol()
-        await this.createDataTableValues()
+        await this.getOLHCDataForSelectedCoin()
+    },
+    async getOLHCDataForSelectedCoin(){
+        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/ohlc?vs_currency=usd&days=30`)
+                .then((resp) => {
+                    debugger
+                    resp.data.forEach((data) => this.series[0].data.push({x: new Date(data[0]), y: data.slice(1)}))  
+                })
+                .catch((error) => {
+                    this.createToast('error', 'Failure', `Failure to get OLHC Data for ${this.selectedCryptoSymbol.name}`)
+                })
     },
     async showCurrentDataForSelectedSymbol(){
         const date = new Date()
         
         await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/market_chart/range?vs_currency=usd&from=${date.getTime()}&to=${date.setFullYear(date.getFullYear() + 1)}`)
                 .then((resp)=>{
-                    debugger
                     console.table(resp.data.prices)
                 }).catch((error) => {
                     console.debug(error)
                 })
     },
     returnDatatableValue(){
-        return `${this.selectedCryptoSymbol} Data`
+        return `${this.selectedCryptoSymbol.name} Data`
     },
     async createDataTableValues(){
-        console.log('Shalom')
-    }
+        console.log("WTF")
+        this.chartOptions.title.text = this.returnDatatableValue()
+    },
   }
 }
 </script>
