@@ -19,10 +19,17 @@
         <div v-else>
             No Data Loaded            
         </div>
-        <Button 
-            @click="obtainFuturePricingEstimate" 
-            class="prediction-data" 
-            :disabled="buttonDisabled">Request Price Prediction</Button>
+        <div v-if="selectedCryptoSymbol">
+            <DataTable :value="returnDatatableValue">
+                <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
+            </DataTable>
+
+            <Button 
+                @click="crypoSelected" 
+                class="prediction-data" 
+                :disabled="buttonDisabled">Request Price Prediction</Button>
+        </div>
+
     </div>
     <Toast />
   </div>
@@ -33,6 +40,8 @@ import axios from "axios"
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
 import { ref } from "vue"
 
 export default {
@@ -40,12 +49,15 @@ export default {
   components: {
     Button,
     Toast,
-    Dropdown
+    Dropdown,
+    DataTable,
+    Column
   },
   setup(){
-    const selectedCryptoSymbol = ref('');
+    const selectedCryptoSymbol = ref(null);
     const cryptoSymbols = ref([]);
     const loading = ref(false);
+    const columns = ref([]);
 
     return { selectedCryptoSymbol, cryptoSymbols, loading }
   },
@@ -84,6 +96,10 @@ export default {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
         }
     },
+    async crypoSelected(){
+        await this.showCurrentDataForSelectedSymbol()
+        this.createDataTableValues
+    },
     async showCurrentDataForSelectedSymbol(){
         const date = new Date()
         
@@ -94,6 +110,12 @@ export default {
                 }).catch((error) => {
                     console.debug(error)
                 })
+    },
+    returnDatatableValue(){
+        return `${this.selectedCryptoSymbol} Data`
+    },
+    createDataTableValues(){
+        console.log('Shalom')
     }
   }
 }

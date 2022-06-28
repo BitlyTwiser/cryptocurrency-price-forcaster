@@ -40,7 +40,7 @@ export default {
       await axios.get('http://127.0.0.1:3005/get-trending-data')
               .then((resp) => {
                 debugger
-                console.log('Trendong')
+                this.createToast('success', 'Data Obtained', 'Retrevied trending data')
               })
               .catch((error) => {
                 this.createToast('error', 'Failed', 'Failed to obtain trending data')
