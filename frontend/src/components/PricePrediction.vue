@@ -20,6 +20,7 @@
             No Data Loaded            
         </div>
         <div v-if="selectedCryptoSymbol">
+            <p><small>OLH</small></p>
             <DataTable :value="returnDatatableValue">
                 <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
             </DataTable>
@@ -98,7 +99,7 @@ export default {
     },
     async crypoSelected(){
         await this.showCurrentDataForSelectedSymbol()
-        this.createDataTableValues
+        await this.createDataTableValues()
     },
     async showCurrentDataForSelectedSymbol(){
         const date = new Date()
@@ -114,7 +115,7 @@ export default {
     returnDatatableValue(){
         return `${this.selectedCryptoSymbol} Data`
     },
-    createDataTableValues(){
+    async createDataTableValues(){
         console.log('Shalom')
     }
   }
