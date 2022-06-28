@@ -1,7 +1,7 @@
 <template>
   <div>
       <div>
-          <Chart type="pie" :data="chartData" class="chart-size" />
+          <Chart type="bar" :data="chartData" class="chart-size" />
       </div>
       <Toast />
   </div>

@@ -1,8 +1,8 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/price-prediction">Price Preditction</router-link> |
-    <router-link to="/historic-chart">View Data</router-link>
+    <router-link to="/price-prediction">Dashboard</router-link> |
+    <router-link to="/historic-chart">Data Dashboard</router-link>
   </nav>
   <router-view/>
 </template>

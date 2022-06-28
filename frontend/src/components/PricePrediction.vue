@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Crypto Price Estimation</h1>
+    <h1>Crypto Price Dashboard</h1>
     <div v-if="loading">
         <Dropdown loading/>
     </div>
@@ -19,16 +19,28 @@
         <div v-else>
             No Data Loaded            
         </div>
+        <div>
+            <Dialog header="Disclaimer" v-model:visible="displayConfirmation" :breakpoints="{'960px': '75vw', '640px': '90vw'}" :style="{width: '350px'}" :modal="true" >
+	            <div class="confirmation-content">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                <span>{{modalContent}}</span>
+            </div>
+            <template #footer>
+                <Button label="Decline" icon="pi pi-times" @click="closeConfirmation" class="p-button-text" autofocus />
+                <Button label="Accept" icon="pi pi-check" @click="obtainFuturePricingEstimate" class="p-button-text" autofocus />
+            </template>
+            </Dialog>
+        </div>
         <div v-if="selectedCryptoSymbol && series[0].data.length > 0">
-            <p><small>OLHC data for {{selectedCryptoSymbol.name}}</small></p>
+            <p><small>OLHC data for {{selectedCryptoSymbol.name}} (30 Days)</small></p>
             <div class="chart">
                 <apexchart type="candlestick" height="350" :options="chartOptions" :series="seriesData"></apexchart>
             </div>
         
             <Button 
-                @click="obtainFuturePricingEstimate" 
+                @click="showDisclaimerModal" 
                 class="prediction-data" 
-                :disabled="buttonDisabled">Request Price Prediction</Button>
+                :disabled="buttonDisabled">Request Future Price Prediction</Button>
         </div>
 
     </div>
@@ -41,6 +53,7 @@ import axios from "axios"
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
+import Dialog from 'primevue/dialog';
 import { ref } from "vue"
 
 export default {
@@ -49,11 +62,14 @@ export default {
     Button,
     Toast,
     Dropdown,
+    Dialog
   },
   setup(){
     const selectedCryptoSymbol = ref(null);
     const cryptoSymbols = ref([]);
     const loading = ref(false);
+    const displayConfirmation = ref(false);
+    const modalContent = ref("This program is not intended to provide finanical advice of any kind. This application is intended to utilize algoriothms to provide the best plausible guess at future prices of cryptocurrency tokens. USE AT YOUR OWN RISK. Accept to continue")
     const chartOptions = ref({
             chart: {
               type: 'candlestick',
@@ -73,8 +89,14 @@ export default {
             }
           });
     const series =  ref([{data: []}]);
+    const openConfirmation = () => {
+            displayConfirmation.value = true;
+        };
+    const closeConfirmation = () => {
+        displayConfirmation.value = false;
+    }
 
-    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series }
+    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation }
   },
   mounted(){
     this.getCrytoSymbols()
@@ -84,7 +106,6 @@ export default {
         return this.selectedCryptoSymbol.length < 1
     },
     seriesData(){
-        debugger
         return this.series
     }
   },
@@ -108,12 +129,17 @@ export default {
     createToast(severity, summary, message){
         this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
     },
+    showDisclaimerModal(){
+        this.openConfirmation()
+    },
     obtainFuturePricingEstimate(){
+        this.closeConfirmation()
+
         if(this.selectedCryptoSymbol){
             console.log(this.selectedCryptoSymbol)
         } else {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
-        }
+        }        
     },
     async crypoSelected(){
         await this.showCurrentDataForSelectedSymbol()
@@ -122,7 +148,6 @@ export default {
     async getOLHCDataForSelectedCoin(){
         await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/ohlc?vs_currency=usd&days=30`)
                 .then((resp) => {
-                    debugger
                     resp.data.forEach((data) => this.series[0].data.push({x: new Date(data[0]), y: data.slice(1)}))  
                 })
                 .catch((error) => {
@@ -141,10 +166,6 @@ export default {
     },
     returnDatatableValue(){
         return `${this.selectedCryptoSymbol.name} Data`
-    },
-    async createDataTableValues(){
-        console.log("WTF")
-        this.chartOptions.title.text = this.returnDatatableValue()
     },
   }
 }
