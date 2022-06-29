@@ -5,22 +5,16 @@
       <p><small>Top 7 trending coins</small></p>
       <trending-chart />
     </div>
-    <div class="trending-gainers-losts-chart">
-      <h3>Trending Gainers and Losers</h3>
-      <trending-gainers-and-losers />
-    </div>
   </section>
 </template>
 
 <script>
 import TrendingChart from '@/components/SubCharts/TrendingChart.vue'
-import TrendingGainersAndLosers from '@/components/SubCharts/TrendingGainersAndLosers.vue'
 
 export default {
   name: "Chart",
   components: {
-    TrendingChart,
-    TrendingGainersAndLosers
+    TrendingChart
   }
 }
 </script>

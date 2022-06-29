@@ -23,7 +23,7 @@ dev_local: dev_frontend return_to_base
 dev_frontend:
 	$(call execute_frontend)
 
-dev return_to_base:
+return_to_base:
 	$(call return_to_base_dir)
 
 dev_docker:

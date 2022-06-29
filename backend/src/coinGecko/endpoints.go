@@ -14,6 +14,7 @@ func (cg *CoinGecko) CoinGeckoConstructor() {
 	cg.baseUrl = "https://api.coingecko.com/api"
 	cg.coinsListEndpoint = "coins/list"
 	cg.coinsTrendingEndpoint = "search/trending"
+	cg.coinsEndpoint = "coins"
 }
 
 func (cg *CoinGecko) requestMaker(structToMarshall interface{}, endpoint string) interface{} {
@@ -44,6 +45,22 @@ func (cg *CoinGecko) requestMaker(structToMarshall interface{}, endpoint string)
 	}
 
 	return structToMarshall
+}
+
+func (cg *CoinGecko) GetCoinData(w http.ResponseWriter, req *http.Request) {
+	keys, ok := req.URL.Query()["coin_id"]
+
+	if !ok || len(keys[0]) < 1 {
+		log.Println("Url Param 'key' is missing")
+		return
+	}
+
+	log.Printf("Getting the data for %s", keys[0])
+
+	var data CoinData
+	filledData := cg.requestMaker(data, fmt.Sprintf("%s/%s", cg.coinsEndpoint, keys[0]))
+
+	json.NewEncoder(w).Encode(filledData)
 }
 
 func (cg *CoinGecko) ListCryptoCurrencies(w http.ResponseWriter, req *http.Request) {
