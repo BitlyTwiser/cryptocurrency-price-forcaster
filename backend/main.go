@@ -1,6 +1,7 @@
 package main
 
 import (
+	"capstone/src/algorithm"
 	"capstone/src/coinGecko"
 	"fmt"
 	"log"
@@ -57,5 +58,6 @@ func newRouter() App {
 	a.router.HandleFunc("/get-crypto-symbols", cg.ListCryptoCurrencies).Methods(http.MethodGet)
 	a.router.HandleFunc("/get-trending-data", cg.ListTrendinCurrencies).Methods(http.MethodGet)
 	a.router.HandleFunc("/get-coin-data", cg.GetCoinData).Methods(http.MethodGet)
+	a.router.HandleFunc("/get-prediction", algorithm.GetFutureCostPrediction).Methods(http.MethodGet)
 	return a
 }

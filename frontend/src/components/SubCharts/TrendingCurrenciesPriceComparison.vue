@@ -10,7 +10,7 @@ import { ref } from 'vue'
 import Chart from 'primevue/chart'
 
 export default {
-    name: 'TrendingGainersAndLosers',
+    name: 'TrendingCurrenciesPriceComparison',
     components: { Chart },
     setup() {
         const chartData = ref({

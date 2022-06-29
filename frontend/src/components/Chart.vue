@@ -5,9 +5,15 @@
       <trending-chart @success="showCandleStickCharts" />
     </div>
     <div v-if="showTrendingCandleStick">
-      <h2>Candle Stick data for Trending Currencies</h2>
+      <h3>Charted Visualizations for Trending Currencies</h3>
       <div>
-        <trending-gainers-and-losers-vue />
+        <div class="trending-currencies-bar-chart" >
+          <trending-currencies-price-comparison />
+        </div>
+        <div class="trending-chart-pie-chart">
+          <trending-currencies-volume-pie-chart />
+        </div>
+        
       </div>
     </div>
   </section>
@@ -16,13 +22,15 @@
 <script>
 import TrendingChart from '@/components/SubCharts/TrendingChart.vue'
 import { ref } from "vue"
-import TrendingGainersAndLosersVue from './SubCharts/TrendingGainersAndLosers.vue'
+import TrendingCurrenciesPriceComparison from '@/components/SubCharts/TrendingCurrenciesPriceComparison.vue'
+import TrendingCurrenciesVolumePieChart from '@/components/SubCharts/TrendingCurrenciesVolumePieChart.vue'
 
 export default {
   name: "Chart",
   components: {
     TrendingChart,
-    TrendingGainersAndLosersVue
+    TrendingCurrenciesPriceComparison,
+    TrendingCurrenciesVolumePieChart
   },
   setup(){
     const showTrendingCandleStick = ref(false);
@@ -38,13 +46,13 @@ export default {
 </script>
 
 <style>
-  .trending-chart {
+  .trending-chart-pie-chart {
     display: inline-block;
-    min-width: 30%;
-    max-width: 30%;
+    min-width: 25%;
+    max-width: 25%;
   }
 
-  .trending-gainers-losts-chart {
+  .trending-currencies-bar-chart {
     display: inline-block;
     min-width: 35%;
     max-width: 35%;
