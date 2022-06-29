@@ -7,13 +7,13 @@
           <div class="card" v-else>
             <DataTable :value="trendingData" responsiveLayout="scroll">
                 <template #header>
-                    Scroll
+                    Top 7 trending coins
                 </template>
                 <Column field="position" header="Position"></Column>
                 <Column field="id" header="ID"></Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="price" header="Price"></Column>
-                <Column field="quantity" header="Total Volum"></Column>
+                <Column field="quantity" header="Total Volume"></Column>
                 <Column field="dailyhigh" header="24 Hour High"></Column>
                 <Column field="dailylow" header="24 Hour Low"></Column>
                 <Column field="chart" header="24 hour candle stick chart">
@@ -102,6 +102,7 @@ export default {
         })
       })
       this.createToast('success', 'Data Obtained', 'Retrevied trending data')
+      this.$emit('success')
       this.loading = false
     },
     setChartDataLabels(data){
@@ -133,55 +134,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-img {
-    vertical-align: middle;
-}
-::v-deep(.p-paginator) {
-    .p-paginator-current {
-        margin-left: auto;
-    }
-}
-
-::v-deep(.p-progressbar) {
-    height: .5rem;
-    background-color: #D8DADC;
-
-    .p-progressbar-value {
-        background-color: #607D8B;
-    }
-}
-
-::v-deep(.p-datepicker) {
-    min-width: 25rem;
-
-    td {
-        font-weight: 400;
-    }
-}
-
-::v-deep(.p-datatable.p-datatable-customers) {
-    .p-datatable-header {
-        padding: 1rem;
-        text-align: left;
-        font-size: 1.5rem;
-    }
-
-    .p-paginator {
-        padding: 1rem;
-    }
-
-    .p-datatable-thead > tr > th {
-        text-align: left;
-    }
-
-    .p-datatable-tbody > tr > td {
-        cursor: auto;
-    }
-
-    .p-dropdown-label:not(.p-placeholder) {
-        text-transform: uppercase;
-    }
-}
-</style>

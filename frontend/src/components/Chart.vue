@@ -1,20 +1,38 @@
 <template>
   <section>
-    <div class="trending-chart">
+    <div>
       <h3>Trending Cryto Currencies</h3>
-      <p><small>Top 7 trending coins</small></p>
-      <trending-chart />
+      <trending-chart @success="showCandleStickCharts" />
+    </div>
+    <div v-if="showTrendingCandleStick">
+      <h2>Candle Stick data for Trending Currencies</h2>
+      <div>
+        <trending-gainers-and-losers-vue />
+      </div>
     </div>
   </section>
 </template>
 
 <script>
 import TrendingChart from '@/components/SubCharts/TrendingChart.vue'
+import { ref } from "vue"
+import TrendingGainersAndLosersVue from './SubCharts/TrendingGainersAndLosers.vue'
 
 export default {
   name: "Chart",
   components: {
-    TrendingChart
+    TrendingChart,
+    TrendingGainersAndLosersVue
+  },
+  setup(){
+    const showTrendingCandleStick = ref(false);
+
+    return { showTrendingCandleStick }
+  },
+  methods: {
+    showCandleStickCharts(){
+      this.showTrendingCandleStick = true
+    }
   }
 }
 </script>
