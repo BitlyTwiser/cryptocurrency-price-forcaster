@@ -8,14 +8,13 @@
       <h3>Charted Visualizations for Trending Currencies</h3>
       <div>
         <div class="trending-currencies-bar-chart" >
-          <p><small>Price Bar Chart</small></p>
+          <p><small>Current Price Comparison Bar Chart</small></p>
           <trending-currencies-price-comparison :trendingData="trendingData"/>
         </div>
         <div class="trending-chart-pie-chart">
-          <p><small>Volume Chart</small></p>
+          <p><small>Total Volume Comparison Pie Chart</small></p>
           <trending-currencies-volume-pie-chart :trendingData="trendingData"/>
         </div>
-        
       </div>
     </div>
   </section>

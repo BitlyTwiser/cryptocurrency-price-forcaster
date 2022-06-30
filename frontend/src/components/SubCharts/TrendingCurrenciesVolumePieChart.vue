@@ -47,17 +47,22 @@ export default {
             return Math.floor(Math.random() * limit)
         },
         setChartDataLabels(){
-            this.trendingData.forEach((c) => this.chartData.labels.push(c.item.name))
+            this.trendingData.forEach((c) => this.chartData.labels.push(c.name))
+        },
+        setBackgroundColors(){
+            let backgroundColorArray = []
+            this.trendingData.forEach(() => {backgroundColorArray.push(`rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`)})
+
+            return backgroundColorArray
+        },
+        trendingDataPrices(){
+            return this.trendingData.map((i) => { return i.quantity })
         },
         setChartData(){
             this.chartData.datasets = [
                 {
-                backgroundColor: [`rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`,`rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`],
-                data: [40, 20, 80, 10]
-                },
-                {
-                backgroundColor: [`rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)},${this.randomInt(256)})`,`rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`, `rgba(${this.randomInt(256)},${this.randomInt(256)}, ${this.randomInt(256)},${this.randomInt(256)})`],
-                data: [100, 90, 2, 124, 5]
+                backgroundColor: this.setBackgroundColors(),
+                data: this.trendingDataPrices()
                 }
             ]
         }

@@ -42,7 +42,6 @@ export default {
   async mounted(){
     this.loading = true
     await this.getTrendingData()
-    console.log(this.trendingData)
     this.loading = false
   },
   setup(){
@@ -71,14 +70,20 @@ export default {
         this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
     },
     async setTableData(data){
+      let counter = 0
+      
       await data.forEach(async (val) => {
         await axios.get(`http://127.0.0.1:3005/get-coin-data?coin_id=${val.item.id}`).then((resp => {
           this.normalizeChartDataAndSetTableData(resp.data)
+          counter++
         })).catch(() => {
           this.createToast('error', 'Failed', 'Failed to obtain coin data')
         })
-      })
-      this.$emit('success', data)
+
+        if(counter === 7){
+          this.$emit('success', this.trendingData)
+        }
+      })      
     },
     normalizeChartDataAndSetTableData(data){
       this.trendingData.push({

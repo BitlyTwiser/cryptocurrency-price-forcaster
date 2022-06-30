@@ -15,21 +15,19 @@ export default {
     props: {
         trendingData: Array
     },
-    setup() {
+    mounted(){
+        this.setChartLabelsAndData()
+    },
+    setup(props) {
         const chartData = ref({
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            labels: props.trendingData.map((i) => { return i.name}),
             datasets: [{
                 type: 'bar',
-                label: 'Dataset 1',
+                label: 'Trending Crypto Data',
                 backgroundColor: '#66BB6A',
-                data: [21,84,24,75,37,65,34],
+                data: props.trendingData.map((i) => {return i.price}),
                 borderColor: 'white',
                 borderWidth: 2
-            }, {
-                type: 'bar',
-                label: 'Dataset 2',
-                backgroundColor: '#FFA726',
-                data: [41,52,24,74,23,21,32]
             }]
         });
 
@@ -62,6 +60,13 @@ export default {
             });
 
 		return { chartData, chartOptions }
+    },
+    methods: {
+        setChartLabelsAndData(){
+            this.trendingData.forEach((c) => {
+
+            })
+        },
     }
 }
 </script>
