@@ -1,7 +1,7 @@
 
 <template>
     <div>
-        <Chart type="pie" :data="chartData" :options="chartOptions" class="chart-size" />
+        <Chart type="pie" :data="returnChartdata" :options="chartOptions" class="chart-size" />
     </div>
 </template>
 
@@ -12,12 +12,21 @@ import Chart from 'primevue/chart'
 export default {
     name: 'TrendingCurrenciesVolumePieChart',
     components: { Chart },
+    props: {
+        trendingData: Array
+    },
     mounted() {
+        this.setChartDataLabels()
         this.setChartData()
+    },
+    computed: {
+        returnChartdata(){
+            return this.chartData
+        }
     },
     setup() {
         const chartData = ref({
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            labels: [],
             datasets: ''
         });
 
@@ -37,8 +46,8 @@ export default {
         randomInt(limit){
             return Math.floor(Math.random() * limit)
         },
-        setChartDataLabels(data){
-            data.forEach((c) => this.chartData.labels.push(c.item.name))
+        setChartDataLabels(){
+            this.trendingData.forEach((c) => this.chartData.labels.push(c.item.name))
         },
         setChartData(){
             this.chartData.datasets = [

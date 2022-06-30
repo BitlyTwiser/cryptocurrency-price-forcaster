@@ -2,16 +2,18 @@
   <section>
     <div>
       <h3>Trending Cryto Currencies</h3>
-      <trending-chart @success="showCandleStickCharts" />
+      <trending-chart @success="showAdditionalChartsOnSuccess" />
     </div>
-    <div v-if="showTrendingCandleStick">
+    <div v-if="showAdditionalCharts && trendingData.length > 0">
       <h3>Charted Visualizations for Trending Currencies</h3>
       <div>
         <div class="trending-currencies-bar-chart" >
-          <trending-currencies-price-comparison />
+          <p><small>Price Bar Chart</small></p>
+          <trending-currencies-price-comparison :trendingData="trendingData"/>
         </div>
         <div class="trending-chart-pie-chart">
-          <trending-currencies-volume-pie-chart />
+          <p><small>Volume Chart</small></p>
+          <trending-currencies-volume-pie-chart :trendingData="trendingData"/>
         </div>
         
       </div>
@@ -33,14 +35,16 @@ export default {
     TrendingCurrenciesVolumePieChart
   },
   setup(){
-    const showTrendingCandleStick = ref(false);
+    const showAdditionalCharts = ref(false);
+    const trendingData = ref();
 
-    return { showTrendingCandleStick }
+    return { showAdditionalCharts, trendingData }
   },
   methods: {
-    showCandleStickCharts(){
-      this.showTrendingCandleStick = true
-    }
+    showAdditionalChartsOnSuccess(data){
+      this.showAdditionalCharts = true
+      this.trendingData = data
+    },
   }
 }
 </script>

@@ -40,7 +40,10 @@ export default {
     ProgressSpinner
   },
   async mounted(){
+    this.loading = true
     await this.getTrendingData()
+    console.log(this.trendingData)
+    this.loading = false
   },
   setup(){
       const loading = ref(false);
@@ -62,21 +65,20 @@ export default {
                 this.createToast('error', 'Failed', 'Failed to obtain trending data')
                 this.loading = false
               })
+      this.createToast('success', 'Data Obtained', 'Retrevied trending data')
     },
     createToast(severity, summary, message){
         this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
     },
     async setTableData(data){
-      data.forEach((val) => {
-        axios.get(`http://127.0.0.1:3005/get-coin-data?coin_id=${val.item.id}`).then((resp => {
+      await data.forEach(async (val) => {
+        await axios.get(`http://127.0.0.1:3005/get-coin-data?coin_id=${val.item.id}`).then((resp => {
           this.normalizeChartDataAndSetTableData(resp.data)
         })).catch(() => {
           this.createToast('error', 'Failed', 'Failed to obtain coin data')
         })
       })
-      this.createToast('success', 'Data Obtained', 'Retrevied trending data')
-      this.$emit('success')
-      this.loading = false
+      this.$emit('success', data)
     },
     normalizeChartDataAndSetTableData(data){
       this.trendingData.push({
