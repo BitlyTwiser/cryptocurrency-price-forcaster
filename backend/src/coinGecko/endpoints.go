@@ -18,16 +18,15 @@ func (cg *CoinGecko) CoinGeckoConstructor() {
 	cg.coinsEndpoint = "coins"
 }
 
-func (cg *CoinGecko) requestMaker(structToMarshall interface{}, endpoint string) interface{} {
+func requestMaker[V interface{} | [][]float64](structToMarshall V, endpoint string, cg *CoinGecko, q url.Values) V {
 	log.Println("Getting the crypto data")
 
 	client := &http.Client{}
+	fmt.Println(fmt.Sprintf("%s/%s/%s", cg.baseUrl, cg.apiVersion, endpoint))
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s", cg.baseUrl, cg.apiVersion, endpoint), nil)
 	if err != nil {
 		log.Print(err)
 	}
-
-	q := url.Values{}
 
 	req.Header.Set("Accepts", "application/json")
 	req.URL.RawQuery = q.Encode()
@@ -59,7 +58,7 @@ func (cg *CoinGecko) GetCoinData(w http.ResponseWriter, req *http.Request) {
 	log.Printf("Getting the data for %s", keys[0])
 
 	var data CoinData
-	filledData := cg.requestMaker(data, fmt.Sprintf("%s/%s", cg.coinsEndpoint, keys[0]))
+	filledData := requestMaker(data, fmt.Sprintf("%s/%s", cg.coinsEndpoint, keys[0]), cg, url.Values{})
 
 	json.NewEncoder(w).Encode(filledData)
 }
@@ -68,7 +67,7 @@ func (cg *CoinGecko) ListCryptoCurrencies(w http.ResponseWriter, req *http.Reque
 	log.Println("Getting the crypto data")
 
 	var data ListCoinData
-	filledData := cg.requestMaker(data, cg.coinsListEndpoint)
+	filledData := requestMaker(data, cg.coinsListEndpoint, cg, url.Values{})
 
 	json.NewEncoder(w).Encode(filledData)
 }
@@ -77,11 +76,19 @@ func (cg *CoinGecko) ListTrendinCurrencies(w http.ResponseWriter, req *http.Requ
 	log.Println("Getting trending data")
 
 	var data TrendingData
-	filledData := cg.requestMaker(data, cg.coinsTrendingEndpoint)
+	filledData := requestMaker(data, cg.coinsTrendingEndpoint, cg, url.Values{})
 
 	json.NewEncoder(w).Encode(filledData)
 }
 
-func (cg *CoinGecko) GetOHLCDataForToken() {
+func (cg *CoinGecko) GetOHLCDataForToken(token string) OhlcData {
 	log.Println("Getting OHLC Data")
+
+	q := url.Values{}
+	q.Add("days", "30")
+	q.Add("vs_currency", "usd")
+	var data OhlcData
+	filledData := requestMaker(data, fmt.Sprintf("%s/%s/%s", cg.coinsEndpoint, token, cg.ohlchEndpoint), cg, q)
+
+	return filledData
 }

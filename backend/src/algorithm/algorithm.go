@@ -25,7 +25,7 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Printf("Starting cost prediction analysis for token %s", keys[0])
 
-	a := algorithm{token: keys[0]}
+	a := algorithm{token: keys[0], classificationData: cg.GetOHLCDataForToken(keys[0])}
 	fmt.Println(a)
 
 }
