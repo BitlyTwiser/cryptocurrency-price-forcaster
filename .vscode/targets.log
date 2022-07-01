@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jun 28 08:27:43 2022
+# Make data base, printed on Thu Jun 30 19:54:19 2022
 
 # Variables
 
@@ -23,7 +23,7 @@ SSH_AGENT_LAUNCHER = gnome-keyring
 # environment
 GJS_DEBUG_OUTPUT = stderr
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-3b6160b1-a130-4399-8814-c0e16bb0f682.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-9936c523-2756-49b2-8d02-4330c45f3293.sock
 # environment
 VSCODE_CWD = /home/steve
 # makefile (from 'Makefile', line 16)
@@ -105,7 +105,7 @@ ZSH = /home/steve/.oh-my-zsh
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 1047915
+VSCODE_PID = 1246217
 # environment
 XDG_SESSION_TYPE = wayland
 # automatic
@@ -199,7 +199,7 @@ MAKE_VERSION := 4.3
 # environment
 MANAGERPID = 4581
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 1047915
+GIO_LAUNCHED_DESKTOP_FILE_PID = 1246217
 # environment
 PAGER = less
 # environment
@@ -273,22 +273,16 @@ return_to_base:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-24 17:27:08.288737755
+#  Last modified 2022-06-28 08:29:39.026840858
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 .DEFAULT:
 #  Implicit rule search has not been done.
+ 
 #  Modification time never checked.
 #  File has not been updated.
-
-dev:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 27):
-	$(call return_to_base_dir)
 
 # Not a target:
 all:
@@ -300,7 +294,6 @@ all:
 dev_local: dev_frontend return_to_base
 #  Implicit rule search has not been done.
 #  Modification time never checked.
- 
 #  File has not been updated.
 #  recipe to execute (from 'Makefile', line 21):
 	$(call execute_go_api)
@@ -320,19 +313,19 @@ dev_frontend:
 	$(call execute_frontend)
 
 # files hash-table stats:
-# Load=9/1024=1%, Rehash=0, Collisions=0/23=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/22=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 19 / storage = 181 B / avg = 9 B
-# current buf: size = 8162 B / used = 181 B / count = 19 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 18 / storage = 177 B / avg = 9 B
+# current buf: size = 8162 B / used = 177 B / count = 18 / avg = 9 B
 
-# strcache performance: lookups = 30 / hit rate = 36%
+# strcache performance: lookups = 28 / hit rate = 35%
 # hash-table stats:
-# Load=19/8192=0%, Rehash=0, Collisions=0/30=0%
-# Finished Make data base on Tue Jun 28 08:27:44 2022
+# Load=18/8192=0%, Rehash=0, Collisions=0/28=0%
+# Finished Make data base on Thu Jun 30 19:54:19 2022
 
  

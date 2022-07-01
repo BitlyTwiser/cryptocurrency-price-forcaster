@@ -5,9 +5,12 @@ type CoinGecko struct {
 	coinsListEndpoint     string
 	coinsEndpoint         string
 	coinsTrendingEndpoint string
+	ohlchEndpoint         string
 	apiVersion            string
 	baseUrl               string
 }
+
+type OhlcData [][]float64
 
 type TrendingData struct {
 	Coins []struct {

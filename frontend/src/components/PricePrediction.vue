@@ -136,7 +136,13 @@ export default {
         this.closeConfirmation()
 
         if(this.selectedCryptoSymbol){
-            console.log(this.selectedCryptoSymbol)
+            axios.post(`http://127.0.0.1:3005/get-prediction?coin_id=${this.selectedCryptoSymbol.id}`)
+            .then((resp) => {
+              console.log("Sup")
+            })
+            .catch((error) => {
+              console.log(error)
+            })
         } else {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
         }        

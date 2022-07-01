@@ -14,6 +14,7 @@ func (cg *CoinGecko) CoinGeckoConstructor() {
 	cg.baseUrl = "https://api.coingecko.com/api"
 	cg.coinsListEndpoint = "coins/list"
 	cg.coinsTrendingEndpoint = "search/trending"
+	cg.ohlchEndpoint = "ohlc?vs_currency=usd&days=30"
 	cg.coinsEndpoint = "coins"
 }
 
@@ -51,7 +52,7 @@ func (cg *CoinGecko) GetCoinData(w http.ResponseWriter, req *http.Request) {
 	keys, ok := req.URL.Query()["coin_id"]
 
 	if !ok || len(keys[0]) < 1 {
-		log.Println("Url Param 'key' is missing")
+		w.Write([]byte("Url Param 'coin_id' is missing"))
 		return
 	}
 
@@ -79,4 +80,8 @@ func (cg *CoinGecko) ListTrendinCurrencies(w http.ResponseWriter, req *http.Requ
 	filledData := cg.requestMaker(data, cg.coinsTrendingEndpoint)
 
 	json.NewEncoder(w).Encode(filledData)
+}
+
+func (cg *CoinGecko) GetOHLCDataForToken() {
+	log.Println("Getting OHLC Data")
 }
