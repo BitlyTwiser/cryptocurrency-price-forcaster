@@ -11,8 +11,9 @@ import (
 
 type algorithm struct {
 	token                    string
-	classificationData       [][]float64
+	classificationData       []float64
 	eulersConstant           float64
+	currentTokenPrice        float64
 	classificationDataValues map[string]interface{}
 }
 
@@ -35,12 +36,6 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// keys, ok := req.URL.Query()["coin_id"]
-
-	// if !ok || len(keys[0]) < 1 {
-	// 	w.Write([]byte("Url Param 'coin_id' is missing"))
-	// 	return
-	// }
 	fmt.Printf("Starting cost prediction analysis for token %s", r.CoinId)
 	fmt.Println(math.E)
 	fmt.Println(math.Pi)
@@ -48,17 +43,19 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("More Complex %v", cmplx.Sqrt(-5*12i))
 	fmt.Printf("Exponent: %.1f", math.Pow(6, 2))
 
-	classificationData := cg.GetOHLCDataForToken(r.CoinId)
-
-	a := algorithm{token: r.CoinId, classificationData: classificationData, eulersConstant: math.E}
-	nums := []float64{1, 2, 3, 4, 5, 6}
-	fmt.Println(a.sumArray(nums...))
-	loop()
+	a := algorithm{
+		token:              r.CoinId,
+		classificationData: cleanClassificationData(cg.GetOHLCDataForToken(r.CoinId)),
+		eulersConstant:     math.E,
+		currentTokenPrice:  r.Price,
+	}
 
 	fmt.Println("Now Printing flat values")
-	for _, v := range cleanClassificationData(classificationData) {
+	for _, v := range a.classificationData {
 		fmt.Println(v)
 	}
+
+	a.train()
 	// fmt.Println(a.classificationData)
 	// At the end take the first and last price, calculate different, add that to price or subtract depending on if the price is going to move up or down.
 }

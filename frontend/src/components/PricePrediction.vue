@@ -36,13 +36,18 @@
             <div class="chart">
                 <apexchart type="candlestick" height="350" :options="chartOptions" :series="seriesData"></apexchart>
             </div>
-        
+
+            <div v-if="loadingPrediction">
+              <p>Performing calculations and training datasets for price estimation</p>
+              <ProgressSpinner style="width:50px;height:50px" strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s"/>
+            </div>
+            <div v-else>
             <Button 
                 @click="showDisclaimerModal" 
                 class="prediction-data" 
                 :disabled="buttonDisabled">Request Future Price Prediction</Button>
+            </div>
         </div>
-
     </div>
     <Toast />
   </div>
@@ -53,8 +58,9 @@ import axios from "axios"
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
-import Dialog from 'primevue/dialog';
+import Dialog from 'primevue/dialog'
 import { ref } from "vue"
+import ProgressSpinner from 'primevue/progressspinner'
 
 export default {
   name: 'PricePrediction',
@@ -62,12 +68,14 @@ export default {
     Button,
     Toast,
     Dropdown,
-    Dialog
+    Dialog,
+    ProgressSpinner
   },
   setup(){
     const selectedCryptoSymbol = ref(null);
     const cryptoSymbols = ref([]);
     const loading = ref(false);
+    const loadingPrediction = ref(false);
     const displayConfirmation = ref(false);
     const modalContent = ref("This program is not intended to provide finanical advice of any kind. This application is intended to utilize algoriothms to provide the best plausible guess at future prices of cryptocurrency tokens. USE AT YOUR OWN RISK. Accept to continue")
     const chartOptions = ref({
@@ -96,7 +104,7 @@ export default {
         displayConfirmation.value = false;
     }
 
-    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation }
+    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation, loadingPrediction }
   },
   mounted(){
     this.getCrytoSymbols()
@@ -133,20 +141,21 @@ export default {
         this.openConfirmation()
     },
     async obtainFuturePricingEstimate(){
+        this.loadingPrediction = true
         this.closeConfirmation()
         const currentPrice = await this.getCurrentPriceOfSelectedCoin()
         debugger
         if(this.selectedCryptoSymbol){
             axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: this.selectedCryptoSymbol.id, price: currentPrice})
             .then((resp) => {
-              console.log("Sup")
+              this.loadingPrediction = false
             })
             .catch((error) => {
               console.log(error)
             })
         } else {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
-        }        
+        }     
     },
     async crypoSelected(){
         await this.showCurrentDataForSelectedSymbol()
@@ -175,14 +184,17 @@ export default {
         return `${this.selectedCryptoSymbol.name} Data`
     },
     async getCurrentPriceOfSelectedCoin(){
+      let price
+
       await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${this.selectedCryptoSymbol.id}&vs_currencies=usd`)
         .then((resp) => {
-          debugger
-          return resp.data[this.selectedCryptoSymbol.id].usd
+          price = resp.data[this.selectedCryptoSymbol.id].usd
         })
         .catch((error) => {
           this.createToast('warning', 'No Data', 'Error getting value price, please try again')
         })
+
+        return price
     }
   }
 }
