@@ -132,11 +132,12 @@ export default {
     showDisclaimerModal(){
         this.openConfirmation()
     },
-    obtainFuturePricingEstimate(){
+    async obtainFuturePricingEstimate(){
         this.closeConfirmation()
-
+        const currentPrice = await this.getCurrentPriceOfSelectedCoin()
+        debugger
         if(this.selectedCryptoSymbol){
-            axios.post(`http://127.0.0.1:3005/get-prediction?coin_id=${this.selectedCryptoSymbol.id}`)
+            axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: this.selectedCryptoSymbol.id, price: currentPrice})
             .then((resp) => {
               console.log("Sup")
             })
@@ -173,6 +174,16 @@ export default {
     returnDatatableValue(){
         return `${this.selectedCryptoSymbol.name} Data`
     },
+    async getCurrentPriceOfSelectedCoin(){
+      await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${this.selectedCryptoSymbol.id}&vs_currencies=usd`)
+        .then((resp) => {
+          debugger
+          return resp.data[this.selectedCryptoSymbol.id].usd
+        })
+        .catch((error) => {
+          this.createToast('warning', 'No Data', 'Error getting value price, please try again')
+        })
+    }
   }
 }
 </script>

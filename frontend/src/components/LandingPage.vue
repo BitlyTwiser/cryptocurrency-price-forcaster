@@ -3,8 +3,8 @@
     <h1>Welcome to the Capstone Cryptocurrency project</h1>
     <p>You can use this app to visualize current/previous cryprocurrency data for trending currencies in the market.</p>
     <p>You can also utlize the machine learning elements of this project to attempt to ascertain what the price of selected coins might be in the future!</p>
-    <p>The prediction mechanism utilizes an adaptation of Guassian Naive Bayes algorithm.</p>
-    <p>Use the navBar above to visit a selected page</p>
+    <p>The prediction mechanism utilizes an adaptation of Guassian Naive Bayes algorithm to attempt to curate a prediction of the future cost of the specified token.</p>
+    <p>Use the navBar above to visit a selected page to get started!</p>
   </div>
 </template>
 
@@ -18,7 +18,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
