@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strconv"
 )
 
 type algorithm struct {
@@ -24,6 +25,7 @@ type AlgorithmRequestBody struct {
 //Get the last 30 days of OLCH data from the endpoint and use that for classification
 func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("Getting started")
+	var returnData = make(map[string]float64)
 	cg := coinGecko.CoinGecko{}
 	cg.CoinGeckoConstructor()
 
@@ -34,15 +36,8 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// Python algo example.
-	// probas.append((1/np.sqrt(2*np.pi*self.stds_[j]**2)*np.exp(-0.5*((X[i]-self.means_[j])/self.stds_[j])**2)).prod()*self.priors_[j])
-	// Get mean of dataset and standard deviation for equation.
 
 	fmt.Printf("Starting cost prediction analysis for token %s", r.CoinId)
-	// fmt.Println(math.E)
-	// fmt.Println(math.Pi)
-	// fmt.Println(math.Sqrt(8))
-	// fmt.Printf("More Complex %v", cmplx.Sqrt(-5*12i))
 
 	a := algorithm{
 		token:              r.CoinId,
@@ -51,33 +46,20 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 		currentTokenPrice:  r.Price,
 	}
 
-	// fmt.Println("Now Printing flat values")
-	// for _, v := range a.classificationData {
-	// 	fmt.Println(v)
-	// }
-	fmt.Printf("Exponent: %.1f\n", math.Pow(6, 2))
-	fmt.Printf("Mean: %v\n", a.mean())
-	fmt.Printf("Standard Deviation: %v\n", a.standardDeviation())
-	fmt.Printf("Probability: %v", a.naiveGuassianBayesAlgorithm())
-	// fmt.Println(a.classificationData)
-	// At the end take the first and last price, calculate different, add that to price or subtract depending on if the price is going to move up or down.
-}
+	val, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", a.naiveGuassianBayesAlgorithm()), 64)
 
-func loop() {
-	items := 10
-
-	for i := 0; i < items; i++ {
-		fmt.Println(math.Floor(float64(i / 2)))
-	}
+	returnData["probability"] = val
+	json.NewEncoder(w).Encode(returnData)
 }
 
 func cleanClassificationData(classificationData coinGecko.OhlcData) []float64 {
 	var flatValues []float64
+	fmt.Println("Cleansing Data..")
 	for _, day := range classificationData {
 
 		for i, val := range day {
 			if i == 0 {
-				fmt.Println(fmt.Sprintf("Cleansing data, removing Value: %.1f", day[i]))
+
 			} else {
 				flatValues = append(flatValues, val)
 			}
@@ -93,48 +75,21 @@ func (alg *algorithm) mean() float64 {
 }
 
 func (alg *algorithm) standardDeviation() float64 {
-	// Gather mean
 	mean := alg.mean()
+	var variance float64
 
-	// setting (val - mean) ^ 2 to all elements of array
-	for i, val := range alg.classificationData {
-		alg.classificationData[i] = math.Pow((val - mean), 2)
+	for _, val := range alg.classificationData {
+		variance += math.Pow((val - mean), 2)
 	}
 
-	varaiance := alg.sumArray(alg.classificationData...)
-
-	return math.Sqrt(varaiance)
+	return math.Sqrt(variance / float64(len(alg.classificationData)))
 }
 
-// P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma^2_y}} \exp\left(-\frac{(x_i - \mu_y)^2}{2\sigma^2_y}\right)
-// I think we loop here, build probabbilitis, used trained data to determine the probvabilty of our current price ,then return value
 func (alg *algorithm) naiveGuassianBayesAlgorithm() float64 {
-	initial := (1 / (math.Sqrt(2 * math.Pi * math.Pow(alg.standardDeviation(), 2))))
-	second := (math.Pow(alg.eulersConstant, math.Pow(-0.5*(alg.currentTokenPrice-(alg.mean()/alg.standardDeviation())), 2)))
+	mean := alg.mean()
+	standardDeviation := alg.standardDeviation()
 
-	probability := initial * second
-
-	return probability
-}
-
-func (alg *algorithm) priceCalculation() {
-
-}
-
-func (alg *algorithm) dataClassigicationEngine() {
-
-}
-
-func (alg *algorithm) laplaceSmoothing() {
-
-}
-
-func (alg *algorithm) train() {
-
-}
-
-func (alg *algorithm) probabillityEngine() {
-
+	return 1 / (math.Sqrt(2*math.Pi) * (standardDeviation)) * math.Pow(math.E, (-math.Pow((alg.currentTokenPrice-mean), 2)/(2*(math.Pow(standardDeviation, 2)))))
 }
 
 func (alg *algorithm) sumArray(items ...float64) float64 {
@@ -144,8 +99,4 @@ func (alg *algorithm) sumArray(items ...float64) float64 {
 	}
 
 	return result
-}
-
-func New() {
-
 }

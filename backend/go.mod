@@ -8,4 +8,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
-require github.com/felixge/httpsnoop v1.0.1 // indirect
+require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/montanaflynn/stats v0.6.6 // indirect
+)
