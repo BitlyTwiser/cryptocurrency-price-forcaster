@@ -37,8 +37,9 @@
                 <apexchart type="candlestick" height="350" :options="chartOptions" :series="seriesData"></apexchart>
             </div>
 
-            <div v-if="probablityData.length > 0 && probablityDataLoaded">
-              <DataTable :value="trendingData" responsiveLayout="scroll">
+            <div v-if="probablityData.length > 0 && probablityDataLoaded" class="probability-table">
+              <p><small>Note: Accuracy score is derrived from the given dataset and accuracy score from Sklearn ML accuracy_analysis algorithm. A score of 1 is effective > 90% accuracy</small></p>
+              <DataTable :value="probablityData" responsiveLayout="scroll">
                 <template #header>
                     Probability Table
                 </template>
@@ -48,6 +49,7 @@
                 <Column field="low_probability" header="Probability of Low Price Occurance"></Column>
                 <Column field="high_price_estimate" header="High Price Estimation"></Column>
                 <Column field="high_probability" header="Probability of High Price Occurance"></Column>
+                <Column field="accuracy_score" header="Accuracy Score (Floating Point)"></Column>
             </DataTable>
             </div>
             <div v-if="loadingPrediction">
@@ -220,14 +222,14 @@ export default {
         return price
     },
     setProbabilityTableData(data){
-      debugger
       this.probablityData.push({
         current_price: data.current_price,
         current_probability: data.current_probability,
         high_price_estimate: data.high_price_estimate,
         high_probability: data.high_probability,
         low_price_estimate: data.low_price_estimate,
-        low_probability: data.low_probability
+        low_probability: data.low_probability,
+        accuracy_score: data.accuracy_score
       })
     }
   }
@@ -240,5 +242,8 @@ export default {
     }
     .dropdown{
         margin-bottom: 10px;
+    }
+    .probability-table{
+      margin-bottom: 10px;
     }
 </style>
