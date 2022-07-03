@@ -1,0 +1,7 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/steve/Documents/gitclones/cryptocurrency-price-forcaster'
+cd frontend && yarn serve &
+cd ..
+cd backend && go run main.go &
+make: Leaving directory '/home/steve/Documents/gitclones/cryptocurrency-price-forcaster'
+ 
