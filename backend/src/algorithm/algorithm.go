@@ -7,6 +7,9 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/pa-m/sklearn/metrics"
+	"gonum.org/v1/gonum/mat"
 )
 
 type algorithm struct {
@@ -28,6 +31,7 @@ type probabilityData struct {
 	HighProbability    float64 `json:"high_probability"`
 	CurrentPrice       float64 `json:"current_price"`
 	CurrentProbability float64 `json:"current_probability"`
+	AccuracyScore      float64 `json:"accuracy_score"`
 }
 
 //Get the last 30 days of OLCH data from the endpoint and use that for classification
@@ -97,6 +101,7 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 		HighPriceEstimate:  maxPrice,
 		CurrentProbability: val,
 		CurrentPrice:       alg.currentTokenPrice,
+		AccuracyScore:      alg.accuracyScore(),
 	}
 
 	return p
@@ -123,6 +128,14 @@ func cleanClassificationData(classificationData coinGecko.OhlcData) []float64 {
 		}
 	}
 	return flatValues
+}
+
+func (alg *algorithm) accuracyScore() float64 {
+	var nilDense *mat.Dense
+	normalize, sampleWeight := true, nilDense
+	Ypred, Ytrue := mat.NewDense(len(alg.classificationData), 1, alg.classificationData), mat.NewDense(len(alg.classificationData), 1, alg.classificationData)
+
+	return metrics.AccuracyScore(Ytrue, Ypred, normalize, sampleWeight)
 }
 
 func (alg *algorithm) mean() float64 {
