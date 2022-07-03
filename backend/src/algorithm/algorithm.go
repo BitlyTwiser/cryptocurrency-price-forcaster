@@ -33,8 +33,7 @@ type probabilityData struct {
 
 //Get the last 30 days of OLCH data from the endpoint and use that for classification
 func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("Getting started")
-	// var returnData = make(map[string]float64)
+	fmt.Println("Getting started with price prediction")
 	cg := coinGecko.CoinGecko{}
 	cg.CoinGeckoConstructor()
 
@@ -55,9 +54,6 @@ func GetFutureCostPrediction(w http.ResponseWriter, req *http.Request) {
 		currentTokenPrice:  r.Price,
 	}
 
-	// val, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", a.naiveGuassianBayesAlgorithm(a.currentTokenPrice)), 64)
-
-	// returnData["probability"] = val
 	json.NewEncoder(w).Encode(a.calculateHighMidLowPrices())
 }
 
@@ -66,12 +62,14 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 	deviation := alg.standardDeviation()
 	min := 0.0
 	max := 0.0
+	var minPrice float64
+	var maxPrice float64
 
-	for _, val := range alg.classificationData {
-		if val < min {
+	for i, val := range alg.classificationData {
+		if val < min || i == 0 {
 			min = val
 		}
-		if val < max {
+		if val > max {
 			max = val
 		}
 	}
@@ -79,17 +77,32 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 	valMin, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", alg.naiveGuassianBayesAlgorithm(min-deviation)), 64)
 	valMax, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", alg.naiveGuassianBayesAlgorithm(max-deviation)), 64)
 	val, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", alg.naiveGuassianBayesAlgorithm(alg.currentTokenPrice)), 64)
-	// Note: Need to fix price estimate
+
+	// Float case price prediction uses alternate calculation.
+	if alg.currentTokenPrice < 0 {
+		minPrice, maxPrice = handleLowFloatCase(deviation, min, max, alg.currentTokenPrice)
+	} else {
+		minPrice = min - deviation
+		maxPrice = max + deviation
+	}
+
 	var p = probabilityData{
 		LowProbability:     valMin,
-		LowPriceEstimate:   min - deviation,
+		LowPriceEstimate:   minPrice,
 		HighProbability:    valMax,
-		HighPriceEstimate:  max + deviation,
+		HighPriceEstimate:  maxPrice,
 		CurrentProbability: val,
 		CurrentPrice:       alg.currentTokenPrice,
 	}
 
 	return p
+}
+
+func handleLowFloatCase(deviation, min, max, currentPrice float64) (float64, float64) {
+	minPrice := currentPrice/deviation - min
+	maxPrice := currentPrice/deviation + max
+
+	return minPrice, maxPrice
 }
 
 func cleanClassificationData(classificationData coinGecko.OhlcData) []float64 {
