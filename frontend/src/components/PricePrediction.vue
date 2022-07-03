@@ -37,6 +37,17 @@
                 <apexchart type="candlestick" height="350" :options="chartOptions" :series="seriesData"></apexchart>
             </div>
 
+            <div v-if="probablityData.length > 0 && probablityDataLoaded">
+              <DataTable :value="trendingData" responsiveLayout="scroll">
+                <template #header>
+                    Probability Table
+                </template>
+                <Column field="probability" header="Probability"></Column>
+                <Column field="price" header="Price"></Column>
+                <Column field="low" header="Low"></Column>
+                <Column field="high" header="High"></Column>
+            </DataTable>
+            </div>
             <div v-if="loadingPrediction">
               <p>Performing calculations and training datasets for price estimation</p>
               <ProgressSpinner style="width:50px;height:50px" strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s"/>
@@ -61,6 +72,8 @@ import Dropdown from 'primevue/dropdown'
 import Dialog from 'primevue/dialog'
 import { ref } from "vue"
 import ProgressSpinner from 'primevue/progressspinner'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 export default {
   name: 'PricePrediction',
@@ -69,7 +82,9 @@ export default {
     Toast,
     Dropdown,
     Dialog,
-    ProgressSpinner
+    ProgressSpinner,
+    DataTable,
+    Column
   },
   setup(){
     const selectedCryptoSymbol = ref(null);
@@ -77,6 +92,8 @@ export default {
     const loading = ref(false);
     const loadingPrediction = ref(false);
     const displayConfirmation = ref(false);
+    const probablityDataLoaded = ref(false);
+    const probablityData = ref([]);
     const modalContent = ref("This program is not intended to provide finanical advice of any kind. This application is intended to utilize algoriothms to provide the best plausible guess at future prices of cryptocurrency tokens. USE AT YOUR OWN RISK. Accept to continue")
     const chartOptions = ref({
             chart: {
@@ -104,7 +121,7 @@ export default {
         displayConfirmation.value = false;
     }
 
-    return { selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation, loadingPrediction }
+    return { probablityDataLoaded, probablityData, selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation, loadingPrediction }
   },
   mounted(){
     this.getCrytoSymbols()
@@ -148,10 +165,16 @@ export default {
         if(this.selectedCryptoSymbol){
             axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: this.selectedCryptoSymbol.id, price: currentPrice})
             .then((resp) => {
+              debugger
+              // Hide the candlestick chart
+              // Show new table, holding all the data returned from the probablity endpoint
               this.loadingPrediction = false
+              this.probablityDataLoaded = true
             })
             .catch((error) => {
               console.log(error)
+              this.loadingPrediction = false
+              this.createToast('warning', 'Error', 'Error Performing calculations, please try later.')
             })
         } else {
             this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
