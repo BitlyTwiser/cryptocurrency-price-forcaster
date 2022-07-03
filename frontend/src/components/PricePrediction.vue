@@ -42,14 +42,16 @@
                 <template #header>
                     Probability Table
                 </template>
-                <Column field="probability" header="Probability"></Column>
-                <Column field="price" header="Price"></Column>
-                <Column field="low" header="Low"></Column>
-                <Column field="high" header="High"></Column>
+                <Column field="current_price" header="Current Price"></Column>
+                <Column field="current_probability" header="Probability for Current Price"></Column>
+                <Column field="low_price_estimate" header="Low Price Estimation"></Column>
+                <Column field="low_probability" header="Probability of Low Price Occurance"></Column>
+                <Column field="high_price_estimate" header="High Price Estimation"></Column>
+                <Column field="high_probability" header="Probability of High Price Occurance"></Column>
             </DataTable>
             </div>
             <div v-if="loadingPrediction">
-              <p>Performing calculations and training datasets for price estimation</p>
+              <p>Performing calculations and training datasets for probability analysis and price estimation</p>
               <ProgressSpinner style="width:50px;height:50px" strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s"/>
             </div>
             <div v-else>
@@ -161,15 +163,13 @@ export default {
         this.loadingPrediction = true
         this.closeConfirmation()
         const currentPrice = await this.getCurrentPriceOfSelectedCoin()
-        debugger
+        
         if(this.selectedCryptoSymbol){
             axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: this.selectedCryptoSymbol.id, price: currentPrice})
             .then((resp) => {
-              debugger
-              // Hide the candlestick chart
-              // Show new table, holding all the data returned from the probablity endpoint
-              this.loadingPrediction = false
+              this.setProbabilityTableData(resp.data)
               this.probablityDataLoaded = true
+              this.loadingPrediction = false
             })
             .catch((error) => {
               console.log(error)
@@ -218,6 +218,17 @@ export default {
         })
 
         return price
+    },
+    setProbabilityTableData(data){
+      debugger
+      this.probablityData.push({
+        current_price: data.current_price,
+        current_probability: data.current_probability,
+        high_price_estimate: data.high_price_estimate,
+        high_probability: data.high_probability,
+        low_price_estimate: data.low_price_estimate,
+        low_probability: data.low_probability
+      })
     }
   }
 }

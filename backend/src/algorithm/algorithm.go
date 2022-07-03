@@ -10,11 +10,10 @@ import (
 )
 
 type algorithm struct {
-	token                    string
-	classificationData       []float64
-	eulersConstant           float64
-	currentTokenPrice        float64
-	classificationDataValues map[string]interface{}
+	token              string
+	classificationData []float64
+	eulersConstant     float64
+	currentTokenPrice  float64
 }
 
 type AlgorithmRequestBody struct {
@@ -79,11 +78,16 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 	val, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", alg.naiveGuassianBayesAlgorithm(alg.currentTokenPrice)), 64)
 
 	// Float case price prediction uses alternate calculation.
-	if alg.currentTokenPrice < 0 {
+	if alg.currentTokenPrice < 1 && alg.currentTokenPrice > 0 {
 		minPrice, maxPrice = handleLowFloatCase(deviation, min, max, alg.currentTokenPrice)
 	} else {
 		minPrice = min - deviation
 		maxPrice = max + deviation
+	}
+
+	// Handle negative value. If this is negative, it does mean the death of the token.
+	if minPrice < 0 {
+		minPrice = 0
 	}
 
 	var p = probabilityData{
