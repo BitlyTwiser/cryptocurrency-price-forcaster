@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Crypto Price Dashboard</h1>
+    <p>Select a currency to continue</p>
     <div v-if="loading">
         <Dropdown loading/>
     </div>
