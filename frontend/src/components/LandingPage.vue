@@ -4,6 +4,7 @@
     <p>You can use this app to visualize current/previous cryprocurrency data for trending currencies in the market.</p>
     <p>You can also utlize the machine learning elements of this project to attempt to ascertain what the price of selected coins might be in the future!</p>
     <p>The prediction mechanism utilizes an adaptation of Guassian Naive Bayes algorithm to attempt to curate a prediction of the future cost of the specified token.</p>
+    <p>The Guassian Naive Bayes algorithm is trained off of the last 30 days of OHLC data that is cleansed and ingested to formulate probabilities of price values and what those price values may be.</p>
     <p>Use the navBar above to visit a selected page to get started!</p>
   </div>
 </template>

@@ -7,14 +7,16 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/pa-m/sklearn/metrics"
+	"gonum.org/v1/gonum/mat"
 )
 
 type algorithm struct {
-	token                    string
-	classificationData       []float64
-	eulersConstant           float64
-	currentTokenPrice        float64
-	classificationDataValues map[string]interface{}
+	token              string
+	classificationData []float64
+	eulersConstant     float64
+	currentTokenPrice  float64
 }
 
 type AlgorithmRequestBody struct {
@@ -29,6 +31,7 @@ type probabilityData struct {
 	HighProbability    float64 `json:"high_probability"`
 	CurrentPrice       float64 `json:"current_price"`
 	CurrentProbability float64 `json:"current_probability"`
+	AccuracyScore      float64 `json:"accuracy_score"`
 }
 
 //Get the last 30 days of OLCH data from the endpoint and use that for classification
@@ -79,11 +82,16 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 	val, _ := strconv.ParseFloat(fmt.Sprintf("%.15f", alg.naiveGuassianBayesAlgorithm(alg.currentTokenPrice)), 64)
 
 	// Float case price prediction uses alternate calculation.
-	if alg.currentTokenPrice < 0 {
+	if alg.currentTokenPrice < 1 && alg.currentTokenPrice > 0 {
 		minPrice, maxPrice = handleLowFloatCase(deviation, min, max, alg.currentTokenPrice)
 	} else {
 		minPrice = min - deviation
 		maxPrice = max + deviation
+	}
+
+	// Handle negative value. If this is negative, it does mean the death of the token.
+	if minPrice < 0 {
+		minPrice = 0
 	}
 
 	var p = probabilityData{
@@ -93,6 +101,7 @@ func (alg *algorithm) calculateHighMidLowPrices() probabilityData {
 		HighPriceEstimate:  maxPrice,
 		CurrentProbability: val,
 		CurrentPrice:       alg.currentTokenPrice,
+		AccuracyScore:      alg.accuracyScore(),
 	}
 
 	return p
@@ -119,6 +128,14 @@ func cleanClassificationData(classificationData coinGecko.OhlcData) []float64 {
 		}
 	}
 	return flatValues
+}
+
+func (alg *algorithm) accuracyScore() float64 {
+	var nilDense *mat.Dense
+	normalize, sampleWeight := true, nilDense
+	Ypred, Ytrue := mat.NewDense(len(alg.classificationData), 1, alg.classificationData), mat.NewDense(len(alg.classificationData), 1, alg.classificationData)
+
+	return metrics.AccuracyScore(Ytrue, Ypred, normalize, sampleWeight)
 }
 
 func (alg *algorithm) mean() float64 {
