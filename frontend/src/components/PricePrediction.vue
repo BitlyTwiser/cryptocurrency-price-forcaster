@@ -75,10 +75,11 @@ import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
 import Dialog from 'primevue/dialog'
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import ProgressSpinner from 'primevue/progressspinner'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { useToast } from "primevue/usetoast"
 
 export default {
   name: 'PricePrediction',
@@ -99,6 +100,7 @@ export default {
     const displayConfirmation = ref(false);
     const probablityDataLoaded = ref(false);
     const probablityData = ref([]);
+    const toast = useToast();
     const modalContent = ref("This program is not intended to provide finanical advice of any kind. This application is intended to utilize algoriothms to provide the best plausible guess at future prices of cryptocurrency tokens. USE AT YOUR OWN RISK. Accept to continue")
     const chartOptions = ref({
             chart: {
@@ -122,14 +124,136 @@ export default {
     const openConfirmation = () => {
             displayConfirmation.value = true;
         };
+
     const closeConfirmation = () => {
         displayConfirmation.value = false;
-    }
+    };
 
-    return { probablityDataLoaded, probablityData, selectedCryptoSymbol, cryptoSymbols, loading, chartOptions, series, modalContent, displayConfirmation, openConfirmation, closeConfirmation, loadingPrediction }
-  },
-  mounted(){
-    this.getCrytoSymbols()
+    onMounted( () => {
+      getCrytoSymbols()
+    });
+
+    const getCrytoSymbols = async () => {
+      loading.value = true
+      await axios.get('http://127.0.0.1:3005/get-crypto-symbols')
+      .then(resp => {
+        normalizeData(resp.data)
+        createToast('success', 'Success', 'Successfully obtained records')
+        loading.value = false
+      })
+      .catch(() => {
+        createToast('error', 'Failed', 'Failed to Obtain Cryptocurrency records')
+        loading.value = false
+      })
+    };
+
+    const normalizeData = (cryptoData) => {
+      cryptoData.forEach(data => cryptoSymbols.value.push(data))
+    };
+
+    const createToast = (severity, summary, message) => {
+        toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
+    };
+
+    const showDisclaimerModal = () => {
+        openConfirmation()
+    };
+
+    const obtainFuturePricingEstimate = async () => {
+        loadingPrediction.value = true
+        closeConfirmation()
+        const currentPrice = await getCurrentPriceOfSelectedCoin()
+        
+        if(selectedCryptoSymbol.value){
+            axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: selectedCryptoSymbol.value.id, price: currentPrice})
+            .then((resp) => {
+              setProbabilityTableData(resp.data)
+              probablityDataLoaded.value = true
+              loadingPrediction.value = false
+            })
+            .catch((error) => {
+              loadingPrediction.value = false
+              createToast('warning', 'Error', 'Error Performing calculations, please try later.')
+            })
+        } else {
+            createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
+        }     
+    };
+
+    const crypoSelected = async () => {
+        await showCurrentDataForSelectedSymbol()
+        await getOLHCDataForSelectedCoin()
+    };
+
+    const getOLHCDataForSelectedCoin = async () => {
+        await axios.get(`https://api.coingecko.com/api/v3/coins/${selectedCryptoSymbol.value.id}/ohlc?vs_currency=usd&days=30`)
+                .then((resp) => {
+                    resp.data.forEach((data) => series.value[0].data.push({x: new Date(data[0]), y: data.slice(1)}))  
+                })
+                .catch((error) => {
+                    createToast('error', 'Failure', `Failure to get OLHC Data for ${selectedCryptoSymbol.value.name}`)
+                })
+    };
+
+    const showCurrentDataForSelectedSymbol = async () => {
+        const date = new Date()
+        
+        await axios.get(`https://api.coingecko.com/api/v3/coins/${selectedCryptoSymbol.value.id}/market_chart/range?vs_currency=usd&from=${date.getTime()}&to=${date.setFullYear(date.getFullYear() + 1)}`)
+                .then((resp)=>{
+                    console.table(resp.data.prices)
+                }).catch((error) => {
+                    console.debug(error)
+                })
+    };
+
+    const returnDatatableValue = () => {
+        return `${selectedCryptoSymbol.value.name} Data`
+    };
+
+    const getCurrentPriceOfSelectedCoin = async () => {
+      let price
+
+      await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${selectedCryptoSymbol.value.id}&vs_currencies=usd`)
+        .then((resp) => {
+          price = resp.data[selectedCryptoSymbol.value.id].usd
+        })
+        .catch((error) => {
+          createToast('warning', 'No Data', 'Error getting value price, please try again')
+        })
+
+        return price
+    };
+
+    const setProbabilityTableData = (data) => {
+      probablityData.value.push({
+        current_price: data.current_price,
+        current_probability: data.current_probability,
+        high_price_estimate: data.high_price_estimate,
+        high_probability: data.high_probability,
+        low_price_estimate: data.low_price_estimate,
+        low_probability: data.low_probability,
+        accuracy_score: data.accuracy_score
+      })
+    };
+
+    return { 
+      probablityDataLoaded, 
+      probablityData, 
+      selectedCryptoSymbol, 
+      cryptoSymbols, 
+      loading, 
+      chartOptions, 
+      series, 
+      modalContent, 
+      displayConfirmation, 
+      openConfirmation, 
+      closeConfirmation, 
+      loadingPrediction, 
+      showDisclaimerModal, 
+      obtainFuturePricingEstimate,
+      returnDatatableValue,
+      crypoSelected
+    }
   },
   computed: {
     buttonDisabled(){
@@ -139,101 +263,6 @@ export default {
         return this.series
     }
   },
-  methods: {
-    async getCrytoSymbols(){
-      this.loading = true
-      await axios.get('http://127.0.0.1:3005/get-crypto-symbols')
-      .then(resp => {
-        this.normalizeData(resp.data)
-        this.createToast('success', 'Success', 'Successfully obtained records')
-        this.loading = false
-      })
-      .catch(() => {
-        this.createToast('error', 'Failed', 'Failed to Obtain Cryptocurrency records')
-        this.loading = false
-      })
-    },
-    normalizeData(cryptoData){
-      cryptoData.forEach(data => this.cryptoSymbols.push(data))
-    },
-    createToast(severity, summary, message){
-        this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
-    },
-    showDisclaimerModal(){
-        this.openConfirmation()
-    },
-    async obtainFuturePricingEstimate(){
-        this.loadingPrediction = true
-        this.closeConfirmation()
-        const currentPrice = await this.getCurrentPriceOfSelectedCoin()
-        
-        if(this.selectedCryptoSymbol){
-            axios.post(`http://127.0.0.1:3005/get-prediction`, {coin_id: this.selectedCryptoSymbol.id, price: currentPrice})
-            .then((resp) => {
-              this.setProbabilityTableData(resp.data)
-              this.probablityDataLoaded = true
-              this.loadingPrediction = false
-            })
-            .catch((error) => {
-              console.log(error)
-              this.loadingPrediction = false
-              this.createToast('warning', 'Error', 'Error Performing calculations, please try later.')
-            })
-        } else {
-            this.createToast('warning', 'No Data', 'A cryptosumbol was not selected, please select an element to predict.')
-        }     
-    },
-    async crypoSelected(){
-        await this.showCurrentDataForSelectedSymbol()
-        await this.getOLHCDataForSelectedCoin()
-    },
-    async getOLHCDataForSelectedCoin(){
-        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/ohlc?vs_currency=usd&days=30`)
-                .then((resp) => {
-                    resp.data.forEach((data) => this.series[0].data.push({x: new Date(data[0]), y: data.slice(1)}))  
-                })
-                .catch((error) => {
-                    this.createToast('error', 'Failure', `Failure to get OLHC Data for ${this.selectedCryptoSymbol.name}`)
-                })
-    },
-    async showCurrentDataForSelectedSymbol(){
-        const date = new Date()
-        
-        await axios.get(`https://api.coingecko.com/api/v3/coins/${this.selectedCryptoSymbol.id}/market_chart/range?vs_currency=usd&from=${date.getTime()}&to=${date.setFullYear(date.getFullYear() + 1)}`)
-                .then((resp)=>{
-                    console.table(resp.data.prices)
-                }).catch((error) => {
-                    console.debug(error)
-                })
-    },
-    returnDatatableValue(){
-        return `${this.selectedCryptoSymbol.name} Data`
-    },
-    async getCurrentPriceOfSelectedCoin(){
-      let price
-
-      await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${this.selectedCryptoSymbol.id}&vs_currencies=usd`)
-        .then((resp) => {
-          price = resp.data[this.selectedCryptoSymbol.id].usd
-        })
-        .catch((error) => {
-          this.createToast('warning', 'No Data', 'Error getting value price, please try again')
-        })
-
-        return price
-    },
-    setProbabilityTableData(data){
-      this.probablityData.push({
-        current_price: data.current_price,
-        current_probability: data.current_probability,
-        high_price_estimate: data.high_price_estimate,
-        high_probability: data.high_probability,
-        low_price_estimate: data.low_price_estimate,
-        low_probability: data.low_probability,
-        accuracy_score: data.accuracy_score
-      })
-    }
-  }
 }
 </script>
 

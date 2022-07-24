@@ -24,12 +24,13 @@
 </template>
 
 <script>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import axios from "axios"
 import Toast from 'primevue/toast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ProgressSpinner from 'primevue/progressspinner'
+import { useToast } from "primevue/usetoast"
 
 export default {
   name: 'TrendingChart',
@@ -39,55 +40,57 @@ export default {
     Column,
     ProgressSpinner
   },
-  async mounted(){
-    this.loading = true
-    await this.getTrendingData()
-    this.loading = false
-  },
-  setup(){
+  setup(props, { emit }){
       const loading = ref(false);
       const trendingData = ref([]);
       const trendingSymbolsData = ref([]);
+      const toast = useToast();
 
-    return { trendingData, trendingSymbolsData, loading }
-  },
-  methods: {
-    async getTrendingData(){
-      this.loading = true
-      await axios.get('http://127.0.0.1:3005/get-trending-data')
-              .then(async (resp) => {
-                const coinData = resp.data.coins
+      onMounted( async () => {
+        loading.value = true
+        await getTrendingData()
+        loading.value = false
+      });
 
-                await this.setTableData(coinData)
-              })
-              .catch((error) => {
-                this.createToast('error', 'Failed', 'Failed to obtain trending data')
-                this.loading = false
-              })
-      this.createToast('success', 'Data Obtained', 'Retrevied trending data')
-    },
-    createToast(severity, summary, message){
-        this.$toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
-    },
-    async setTableData(data){
+      const getTrendingData = async () => {
+        loading.value = true
+        await axios.get('http://127.0.0.1:3005/get-trending-data')
+                .then(async (resp) => {
+                  const coinData = resp.data.coins
+
+                  await setTableData(coinData)
+                })
+                .catch((error) => {
+                  createToast('error', 'Failed', 'Failed to obtain trending data')
+                  loading.value = false
+                })
+        createToast('success', 'Data Obtained', 'Retrevied trending data')
+    };
+
+    const createToast = (severity, summary, message) => {
+        toast.add({severity: severity, summary:  summary, detail: message, life: 3000})
+    };
+
+    const setTableData = async (data) => {
       let counter = 0
       
       await data.forEach(async (val) => {
         await axios.get(`http://127.0.0.1:3005/get-coin-data?coin_id=${val.item.id}`).then((resp => {
-          this.normalizeChartDataAndSetTableData(resp.data)
+          normalizeChartDataAndSetTableData(resp.data)
           counter++
         })).catch(() => {
-          this.createToast('error', 'Failed', 'Failed to obtain coin data')
+          createToast('error', 'Failed', 'Failed to obtain coin data')
         })
 
         if(counter === 7){
-          this.$emit('success', this.trendingData)
+          emit('success', trendingData.value)
         }
       })      
-    },
-    normalizeChartDataAndSetTableData(data){
-      this.trendingData.push({
-        position: this.trendingData.length,
+    };
+
+    const normalizeChartDataAndSetTableData = (data) => {
+      trendingData.value.push({
+        position: trendingData.value.length,
         id: data.id,
         name: data.name,
         price: data.market_data.current_price.usd,
@@ -95,7 +98,9 @@ export default {
         dailyhigh: data.market_data.high_24h.usd,
         dailylow: data.market_data.low_24h.usd,
       })
-    },
+    };
+
+    return { trendingData, trendingSymbolsData, loading }
   },
 }
 </script>
