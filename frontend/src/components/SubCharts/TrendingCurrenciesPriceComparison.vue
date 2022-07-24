@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Chart from 'primevue/chart'
 
 export default {
@@ -14,9 +14,6 @@ export default {
     components: { Chart },
     props: {
         trendingData: Array
-    },
-    mounted(){
-        this.setChartLabelsAndData()
     },
     setup(props) {
         const chartData = ref({
@@ -59,14 +56,20 @@ export default {
                 }
             });
 
+        const setChartLabelsAndData = () => {
+            props.trendingData.forEach((c) => {
+
+            })
+        };
+
+        onMounted(() => {
+            setChartLabelsAndData()
+        });
+
 		return { chartData, chartOptions }
     },
     methods: {
-        setChartLabelsAndData(){
-            this.trendingData.forEach((c) => {
 
-            })
-        },
     }
 }
 </script>

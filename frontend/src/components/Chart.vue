@@ -37,14 +37,13 @@ export default {
     const showAdditionalCharts = ref(false);
     const trendingData = ref();
 
-    return { showAdditionalCharts, trendingData }
+    const showAdditionalChartsOnSuccess = (data) => {
+        showAdditionalCharts.value = true
+        trendingData.value = data
+    };
+
+    return { showAdditionalCharts, trendingData, showAdditionalChartsOnSuccess }
   },
-  methods: {
-    showAdditionalChartsOnSuccess(data){
-      this.showAdditionalCharts = true
-      this.trendingData = data
-    },
-  }
 }
 </script>
 
