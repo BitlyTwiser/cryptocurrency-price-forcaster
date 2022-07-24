@@ -60,6 +60,8 @@ Just run the Makefile command: make dev_docker
 - You will then fall upon the landing page of the application.
 
 - The links above which will take you to the primary pages in the application. Moving onto the Data Dashoard, the user will be greeted with the following view:
+![Trending currencies](./resources/images/Screenshot%20from%202022-07-03%2012-41-59.png)
+![Trending currencies charts](./resources/images/Screenshot%20from%202022-07-03%2012-42-11.png)
 
 - Here we can see several visual components displayed, showing us the top 7 trending cryptocurrencies in a table, followed by the bar graph comparing the prices of the trending currencies and the volume pie charts showing the volume each currency holds in the market.   
 Note: Some coins DO have much larger volumes or much lower prices than others being displayed. This may cause some unique graphs to appear.
@@ -68,11 +70,14 @@ The Pie chart is interactive, where if you only desire to see a subset of coins,
 - This allows you to modify the view to your liking.
 
 2. Moving to the Price Dashboard page, you will see the following page loaded: 
+![Price Dashboard](./resources/images/Screenshot%20from%202022-07-03%2012-42-39.png)
 
 3. Upon selecting a token, the candlestick chart will appear using the OHLC data from the selected token:
 - You can interact with the candlestick chart using the icons in the upper right corner.
+![Price Dashboard](./resources/images/Screenshot%20from%202022-07-03%2012-43-05.png)
 
 - Lastly, and more importantly,  you can use the button on the bottom center to request pricing prediction using the machine learning model of the application. The button, when clicked, will force you to accept a EULA:
+![EULA](./resources/images/Screenshot%20from%202022-07-03%2012-42-55.png)
  
-- After accepting the Disclaimer, you will see the probability table appear after the machine learning model has provide the feedback data:
+- After accepting the Disclaimer, you will see the probability table appear after the machine learning model has provide the feedback data. (See screenshot above for the candlestick data)
 
