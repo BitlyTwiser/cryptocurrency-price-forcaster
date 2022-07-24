@@ -70,9 +70,6 @@ export default {
 
 		return { chartData, chartOptions }
     },
-    methods: {
-
-    }
 }
 </script>
 
